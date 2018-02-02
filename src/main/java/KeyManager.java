@@ -18,7 +18,7 @@ public final class KeyManager {
 
     /** Logger */
     // private static final String JCE_PROVIDER = "SUN";
-    private static final String KEYSTORE_FILENAME = "wae.keystore.new";
+    private static final String KEYSTORE_FILENAME = "wae.keystore";
     private static final String KEYSTORE_TYPE = "jceks";
 
     private KeyStoreProps iKeyStoreProps = null;
@@ -337,7 +337,7 @@ public final class KeyManager {
      * This is a class handles secured key store information: key store location, key store passphrase, key passphrase
      */
     protected class KeyStoreProps {
-        private static final String KEYSTORE_PROP_FILE = "wae_keymgmt.properties.new";
+        private static final String KEYSTORE_PROP_FILE = "wae_keymgmt.properties";
         private static final String ENCODING_KEY = "d308ae9f8a204cbfbabc0919abc87abd"; // generated
                                                                                        // using
                                                                                        // IBM

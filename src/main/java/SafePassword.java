@@ -8,6 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -26,16 +27,17 @@ public class SafePassword {
     }
 
     private static final String ENCODING_KEY = "d308ae9f8a204cbfbabc0919abc87abd";
-    private static final String KEYSTORE_FILENAME = "wae.keystore.new";
+    private static final String KEYSTORE_FILENAME = "wae.keystore";
     private static final String KEYSTORE_TYPE = "jceks";
 
-    public static void main(String [] argv) throws IOException{
+    public static void main2(String [] argv) throws IOException{
 
         generateKeyStore("asd","netas");
 
         KeyManager keyManager = new KeyManager();
 
         keyManager.importKeyFromHexStr("1785FC64DB5956AD86C6674BE742072E", "AES", "eeee", "netas".toCharArray());
+        //TODO : gerçek wae.keystore yap
         keyManager.saveKeyStore("netas".toCharArray());
 
         String[] keys = keyManager.listKeys().split("\n");
@@ -72,7 +74,7 @@ public class SafePassword {
         }
     }
 
-    public static void main1(String [] argv) throws IOException {
+    public static void main(String [] argv) throws IOException {
         KeyManager keyManager = new KeyManager();
         String[] keys = keyManager.listKeys().split("\n");
         String[] asd = new String[keys.length-3];
@@ -98,7 +100,7 @@ public class SafePassword {
         return new String(hexChars);
     }
 
-    public static void main2(String [] argv) {
+    public static void main1(String [] argv) {
         try {
             Cipher lCipher = Cipher.getInstance("AES");
             SecretKey iEncodingKey = null;
@@ -113,19 +115,34 @@ public class SafePassword {
             iKeyStoreProps.load(lCos);
 
             String lPassphrase = iKeyStoreProps.getProperty("key_store_passphrase");
-            iKeyStoreProps.list(System.out);
+          //  iKeyStoreProps.list(System.out);
 
-            System.out.println(lPassphrase);
-
+           // System.out.println(lPassphrase);
+            String aesPass = iKeyStoreProps.getProperty("default_file_aes_128");
             FileInputStream lFis = new FileInputStream(KEYSTORE_FILENAME);
             KeyStore iKeyStore = KeyStore.getInstance(KEYSTORE_TYPE);
             iKeyStore.load(lFis, lPassphrase.toCharArray());
-
+            Key key = iKeyStore.getKey("default_file_aes_128",aesPass.toCharArray());
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(2,key);
+            String encrpted = "265CC8E9A5B565CACC0FBEE4E97FB7A0";
+            System.out.println(cipher.doFinal(hexStrToBytes(encrpted)));
+            //System.out.println(new String(key.getEncoded()));
             lCos.close();
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static byte[] hexStrToBytes(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        len--; // don't trap on odd length String.
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
     }
     public static void maian(String [] argv){
 
